@@ -90,96 +90,124 @@ def home():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Budget Management Chatbot</title>
+        <title>Budget Management Experiment</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 margin: 0;
                 padding: 20px;
                 display: flex;
                 height: 100vh;
+                background-color: #f5f7fa;
             }
             .container {
                 display: flex;
                 width: 100%;
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: auto;
-                gap: 20px;
+                gap: 30px;
             }
             .chat-container {
                 flex: 2;
                 display: flex;
                 flex-direction: column;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 20px;
+                border: 1px solid #e1e4e8;
+                border-radius: 10px;
+                padding: 25px;
+                background: white;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             }
             .commands-container {
                 flex: 1;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 20px;
+                border: 1px solid #e1e4e8;
+                border-radius: 10px;
+                padding: 25px;
+                background: white;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }
+            h2, h3 {
+                color: #2c3e50;
+                margin-bottom: 20px;
+                font-weight: 600;
             }
             #chat-messages {
                 flex-grow: 1;
                 overflow-y: auto;
                 margin-bottom: 20px;
-                padding: 10px;
-                background: #f9f9f9;
-                border-radius: 5px;
-                min-height: 300px;
+                padding: 15px;
+                background: #f8fafc;
+                border-radius: 8px;
+                min-height: 400px;
+                border: 1px solid #edf2f7;
             }
             .message {
-                margin: 10px 0;
-                padding: 10px;
-                border-radius: 5px;
+                margin: 12px 0;
+                padding: 12px 16px;
+                border-radius: 8px;
+                line-height: 1.5;
             }
             .user-message {
-                background: #e3f2fd;
+                background: #ebf8ff;
                 margin-left: 20px;
+                border-left: 4px solid #4299e1;
             }
             .bot-message {
-                background: #f5f5f5;
+                background: #f7fafc;
                 margin-right: 20px;
+                border-left: 4px solid #a0aec0;
                 white-space: pre-wrap;
             }
             .input-container {
                 display: flex;
-                gap: 10px;
+                gap: 12px;
             }
             #user-input {
                 flex-grow: 1;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
+                padding: 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 15px;
+                transition: border-color 0.2s;
+            }
+            #user-input:focus {
+                outline: none;
+                border-color: #4299e1;
             }
             button {
-                padding: 10px 20px;
-                background: #2196F3;
+                padding: 12px 24px;
+                background: #4299e1;
                 color: white;
                 border: none;
-                border-radius: 5px;
+                border-radius: 8px;
                 cursor: pointer;
+                font-weight: 500;
+                transition: background 0.2s;
             }
             button:hover {
-                background: #1976D2;
+                background: #3182ce;
             }
             .command {
-                margin: 10px 0;
-                padding: 10px;
-                background: #f0f0f0;
-                border-radius: 5px;
+                margin: 12px 0;
+                padding: 12px;
+                background: #f7fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
                 cursor: pointer;
+                transition: all 0.2s;
+                font-size: 14px;
+                color: #4a5568;
             }
             .command:hover {
-                background: #e0e0e0;
+                background: #edf2f7;
+                border-color: #cbd5e0;
+                transform: translateX(5px);
             }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="chat-container">
-                <h2>Budget Management Chatbot</h2>
+                <h2>🚀 Budget Management Experiment</h2>
                 <div id="chat-messages"></div>
                 <div class="input-container">
                     <input type="text" id="user-input" placeholder="Type your message here...">
@@ -187,11 +215,12 @@ def home():
                 </div>
             </div>
             <div class="commands-container">
-                <h3>Available Commands</h3>
-                <div class="command" onclick="useCommand(this.innerText)">add user [ldap] [first name] [last name] [email] [level]</div>
+                <h3>💡 Available Commands</h3>
+                <div class="command" onclick="useCommand(this.innerText)">add user ldap [ldap] first name [FirstName] last name [LastName] email [EmailID] level [level]</div>
                 <div class="command" onclick="useCommand(this.innerText)">show me my organization as [ldap]</div>
                 <div class="command" onclick="useCommand(this.innerText)">add aop name "[name]" amount [amount]</div>
                 <div class="command" onclick="useCommand(this.innerText)">add budget aop [id] amount [amount] project "[name]"</div>
+                <div class="command" onclick="useCommand(this.innerText)">list budgets aop [id]</div>
                 <div class="command" onclick="useCommand(this.innerText)">list users</div>
                 <div class="command" onclick="useCommand(this.innerText)">list aops</div>
                 <div class="command" onclick="useCommand(this.innerText)">help</div>
@@ -260,7 +289,6 @@ def chat():
     session = Session()
     
     try:
-        # Handle commands
         if message.startswith("add user"):
             return handle_add_user(message, session)
         elif message.startswith("show me my organization"):
@@ -269,6 +297,8 @@ def chat():
             return handle_add_aop(message, session)
         elif message.startswith("add budget"):
             return handle_add_budget(message, session)
+        elif message.startswith("list budgets aop"):
+            return handle_list_budgets_by_aop(message, session)
         elif message == "list users":
             return handle_list_users(session)
         elif message == "list aops":
@@ -276,10 +306,11 @@ def chat():
         elif message == "help":
             return jsonify({"response": """
 Available commands:
-- add user [ldap] [first name] [last name] [email] [level]
+- add user ldap [ldap] first name [FirstName] last name [LastName] email [EmailID] level [level]
 - show me my organization as [ldap]
 - add aop name "[name]" amount [amount]
 - add budget aop [id] amount [amount] project "[name]"
+- list budgets aop [id]
 - list users
 - list aops
 - help
@@ -301,6 +332,39 @@ def handle_list_aops(session):
     aops = session.query(AOP).filter_by(is_active=True).all()
     aop_list = [f"ID: {aop.id}, Name: {aop.name}, Amount: ${aop.total_amount:,.2f}" for aop in aops]
     return jsonify({"response": "AOPs:\n" + "\n".join(aop_list) if aop_list else "No AOPs found"})
+
+def handle_list_budgets_by_aop(message, session):
+    try:
+        aop_id = int(message.split("aop")[-1].strip())
+        
+        # First verify if AOP exists
+        aop = session.query(AOP).filter_by(id=aop_id, is_active=True).first()
+        if not aop:
+            return jsonify({"response": f"AOP with ID {aop_id} not found"})
+        
+        # Get all budgets for this AOP
+        budgets = session.query(Budget).filter_by(aop_id=aop_id, is_active=True).all()
+        
+        if not budgets:
+            return jsonify({"response": f"No budgets found for AOP {aop_id} ({aop.name})"})
+        
+        budget_list = [
+            f"Budget ID: {budget.budget_id}\n"
+            f"Project: {budget.project}\n"
+            f"Amount: ${budget.amount:,.2f}\n"
+            f"---" for budget in budgets
+        ]
+        
+        total_amount = sum(budget.amount for budget in budgets)
+        
+        response = f"Budgets for AOP {aop_id} ({aop.name}):\n\n"
+        response += "\n\n".join(budget_list)
+        response += f"\n\nTotal Budget Amount: ${total_amount:,.2f}"
+        
+        return jsonify({"response": response})
+        
+    except (ValueError, IndexError):
+        return jsonify({"response": "Please provide AOP ID (e.g., list budgets aop 1)"})
 
 def handle_add_user(message, session):
     # Extract user info from message
@@ -380,6 +444,11 @@ def handle_add_budget(message, session):
     except (ValueError, IndexError):
         return jsonify({"response": 'Please provide: aop ID, amount, and project name (e.g., add budget aop 1 amount 50000 project "Project Alpha")'})
     
+    # Verify AOP exists and is active
+    aop = session.query(AOP).filter_by(id=aop_id, is_active=True).first()
+    if not aop:
+        return jsonify({"response": f"AOP with ID {aop_id} not found or inactive"})
+    
     budget = Budget(
         budget_id=f"BUD{datetime.now().strftime('%Y%m%d%H%M%S')}",
         aop_id=aop_id,
@@ -387,9 +456,13 @@ def handle_add_budget(message, session):
         amount=amount
     )
     session.add(budget)
+    
+    # Update AOP total amount
+    aop.total_amount += amount
+    
     session.commit()
     
-    return jsonify({"response": f"Budget created successfully with ID: {budget.budget_id}"})
+    return jsonify({"response": f"Budget created successfully with ID: {budget.budget_id}\nProject: {project}\nAmount: ${amount:,.2f}\nAOP: {aop.name} (ID: {aop_id})"})
 
 if __name__ == '__main__':
     app.run(debug=True)
